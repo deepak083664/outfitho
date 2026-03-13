@@ -1,0 +1,136 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Syne:wght@400;700;800&family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@700;800;900&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #ff3f6c; /* Myntra brand-like pink/red */
+  --color-dark: #282c3f;
+  --color-secondary: #535766;
+  --color-light: #94969f;
+  --color-border: #eaeaec;
+  --color-background: #ffffff;
+  --color-surface: #f5f5f6;
+  --color-gold: #c5a059;
+  
+  --font-sans: "Inter", sans-serif;
+  --font-heading: "Outfit", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-luxury: "Playfair Display", serif;
+  --font-brand-modern: "Syne", sans-serif;
+  --font-brand-classic: "Cinzel", serif;
+  --font-brand-elegant: "Cormorant Garamond", serif;
+  --font-brand-bold: "Montserrat", sans-serif;
+
+  --shadow-sleek: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 8px 24px 0 rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 2px 8px 0 rgba(0, 0, 0, 0.1);
+  
+  --transition-timing-ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+@layer utilities {
+  .text-luxury-gradient {
+    @apply bg-gradient-to-r from-[#1a1a1a] via-[#4a4a4a] to-[#1a1a1a] bg-clip-text text-transparent;
+  }
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-dark);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+  
+  ::selection {
+    background-color: var(--color-primary);
+    color: #ffffff;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    color: var(--color-dark);
+    letter-spacing: -0.01em;
+  }
+}
+
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4d5d9;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94969f;
+}
+
+@layer components {
+  /* Buttons */
+  .btn-primary {
+    @apply bg-[var(--color-primary)] text-white font-bold py-3 px-8 rounded uppercase tracking-wider transition-all duration-300 hover:opacity-90 active:scale-95 shadow-md;
+  }
+  
+  .btn-outline {
+    @apply border border-[var(--color-border)] text-[var(--color-dark)] font-bold py-3 px-8 rounded uppercase tracking-wider transition-all duration-300 hover:border-[var(--color-dark)] active:scale-95;
+  }
+
+  .btn-ghost {
+    @apply text-[var(--color-dark)] font-semibold py-2 px-4 transition-all duration-300 hover:bg-[var(--color-surface)] rounded;
+  }
+
+  /* Form Elements */
+  .input-field {
+    @apply w-full border border-[var(--color-border)] rounded px-4 py-2 focus:outline-none focus:border-[var(--color-light)] transition-colors;
+  }
+
+  /* Cards */
+  .fashion-card {
+    @apply bg-white transition-all duration-300 hover:shadow-card;
+  }
+
+  /* Horizontal Scrollbar Hide */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Sticky Bottom Navigation Padding */
+  .pb-sticky-btn {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 80px);
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes slideRight {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-slide-right {
+  animation: slideRight 0.3s ease-out forwards;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
