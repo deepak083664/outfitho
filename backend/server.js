@@ -9,6 +9,7 @@ const compression = require('compression');
 const connectDB = require('./config/db');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
+// Load environment variables
 dotenv.config();
 
 // Connect to MongoDB
@@ -19,28 +20,30 @@ const app = express();
 // 1. Security Headers
 app.use(helmet());
 
-// 2. Restricted CORS
+// 2. CORS Configuration
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL || '*',
   optionsSuccessStatus: 200,
   credentials: true
 };
 app.use(cors(corsOptions));
 
 // 3. Body Parser & Sanitization
-app.use(express.json({ limit: '10kb' })); // Limit body size to prevent DoS
-app.use(mongoSanitize()); // Prevent NoSQL injection
-app.use(hpp()); // Prevent HTTP Parameter Pollution
+app.use(express.json({ limit: '10kb' })); 
+app.use(mongoSanitize()); 
+app.use(hpp()); 
 
 // 4. Rate Limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000, 
+  max: 100, 
   message: 'Too many requests from this IP, please try again after 15 minutes'
 });
-app.use('/api', limiter);
+if (process.env.NODE_ENV === 'production') {
+  app.use('/api', limiter);
+}
 
-// 5. Optimization
+// 5. Response Compression
 app.use(compression());
 
 // Routes

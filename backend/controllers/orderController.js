@@ -4,19 +4,20 @@ const Order = require('../models/Order');
 // @route   POST /api/orders
 // @access  Private
 const addOrderItems = async (req, res) => {
-  const {
-    orderItems,
-    shippingAddress,
-    paymentMethod,
-    taxPrice,
-    shippingPrice,
-    totalPrice,
-  } = req.body;
+  try {
+    const {
+      orderItems,
+      shippingAddress,
+      paymentMethod,
+      taxPrice,
+      shippingPrice,
+      totalPrice,
+    } = req.body;
 
-  if (orderItems && orderItems.length === 0) {
-    res.status(400).json({ message: 'No order items' });
-    return;
-  } else {
+    if (orderItems && orderItems.length === 0) {
+      return res.status(400).json({ message: 'No order items' });
+    }
+
     const order = new Order({
       orderItems,
       user: req.user._id,
@@ -29,6 +30,54 @@ const addOrderItems = async (req, res) => {
 
     const createdOrder = await order.save();
     res.status(201).json(createdOrder);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Get order by ID
+// @route   GET /api/orders/:id
+// @access  Private
+const getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate('user', 'name email')
+      .lean();
+
+    if (order) {
+      res.json(order);
+    } else {
+      res.status(404).json({ message: 'Order not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Update order to paid
+// @route   PUT /api/orders/:id/pay
+// @access  Private
+const updateOrderToPaid = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (order) {
+      order.isPaid = true;
+      order.paidAt = Date.now();
+      order.paymentResult = {
+        id: req.body.id,
+        status: req.body.status,
+        update_time: req.body.update_time,
+        email_address: req.body.email_address,
+      };
+
+      const updatedOrder = await order.save();
+      res.json(updatedOrder);
+    } else {
+      res.status(404).json({ message: 'Order not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -36,43 +85,35 @@ const addOrderItems = async (req, res) => {
 // @route   GET /api/orders/myorders
 // @access  Private
 const getMyOrders = async (req, res) => {
-  const orders = await Order.find({ user: req.user._id })
-    .sort({ createdAt: -1 })
-    .lean();
-  res.json(orders);
+  try {
+    const orders = await Order.find({ user: req.user._id })
+      .sort({ createdAt: -1 })
+      .lean();
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 // @desc    Get all orders (Admin)
 // @route   GET /api/orders
 // @access  Private/Admin
 const getOrders = async (req, res) => {
-  const page = Number(req.query.pageNumber) || 1;
-  const pageSize = 10;
+  try {
+    const page = Number(req.query.pageNumber) || 1;
+    const pageSize = 10;
 
-  const count = await Order.countDocuments();
-  const orders = await Order.find({})
-    .populate('user', 'id name email')
-    .limit(pageSize)
-    .skip(pageSize * (page - 1))
-    .sort({ createdAt: -1 })
-    .lean();
+    const count = await Order.countDocuments();
+    const orders = await Order.find({})
+      .populate('user', 'id name email')
+      .limit(pageSize)
+      .skip(pageSize * (page - 1))
+      .sort({ createdAt: -1 })
+      .lean();
 
-  res.json({ orders, page, pages: Math.ceil(count / pageSize), total: count });
-};
-
-// @desc    Get order by ID
-// @route   GET /api/orders/:id
-// @access  Private
-const getOrderById = async (req, res) => {
-  const order = await Order.findById(req.params.id).populate(
-    'user',
-    'name email'
-  );
-
-  if (order) {
-    res.json(order);
-  } else {
-    res.status(404).json({ message: 'Order not found' });
+    res.json({ orders, page, pages: Math.ceil(count / pageSize), total: count });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -80,19 +121,23 @@ const getOrderById = async (req, res) => {
 // @route   PUT /api/orders/:id/status
 // @access  Private/Admin
 const updateOrderStatus = async (req, res) => {
-  const { status } = req.body;
-  const order = await Order.findById(req.params.id);
+  try {
+    const { status } = req.body;
+    const order = await Order.findById(req.params.id);
 
-  if (order) {
-    order.status = status;
-    if (status === 'Delivered') {
-       order.isDelivered = true;
-       order.deliveredAt = Date.now();
+    if (order) {
+      order.status = status;
+      if (status === 'Delivered') {
+        order.isDelivered = true;
+        order.deliveredAt = Date.now();
+      }
+      const updatedOrder = await order.save();
+      res.json(updatedOrder);
+    } else {
+      res.status(404).json({ message: 'Order not found' });
     }
-    const updatedOrder = await order.save();
-    res.json(updatedOrder);
-  } else {
-    res.status(404).json({ message: 'Order not found' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -100,25 +145,30 @@ const updateOrderStatus = async (req, res) => {
 // @route   PUT /api/orders/:id/deliver
 // @access  Private/Admin
 const updateOrderToDelivered = async (req, res) => {
-  const order = await Order.findById(req.params.id);
+  try {
+    const order = await Order.findById(req.params.id);
 
-  if (order) {
-    order.isDelivered = true;
-    order.deliveredAt = Date.now();
-    order.status = 'Delivered';
+    if (order) {
+      order.isDelivered = true;
+      order.deliveredAt = Date.now();
+      order.status = 'Delivered';
 
-    const updatedOrder = await order.save();
-    res.json(updatedOrder);
-  } else {
-    res.status(404).json({ message: 'Order not found' });
+      const updatedOrder = await order.save();
+      res.json(updatedOrder);
+    } else {
+      res.status(404).json({ message: 'Order not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
-module.exports = { 
-  addOrderItems, 
-  getMyOrders, 
-  getOrders, 
+module.exports = {
+  addOrderItems,
   getOrderById,
+  updateOrderToPaid,
+  getMyOrders,
+  getOrders,
   updateOrderStatus,
-  updateOrderToDelivered 
+  updateOrderToDelivered,
 };
