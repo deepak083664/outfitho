@@ -1,10 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const mongoSanitize = require('express-mongo-sanitize');
-const hpp = require('hpp');
 const compression = require('compression');
 const connectDB = require('./config/db');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
@@ -17,33 +13,12 @@ connectDB();
 
 const app = express();
 
-// 1. Security Headers
-app.use(helmet());
-
-// 2. CORS Configuration
-const corsOptions = {
+// 1. Basic Middlewares
+app.use(express.json()); 
+app.use(cors({
   origin: process.env.FRONTEND_URL || '*',
-  optionsSuccessStatus: 200,
   credentials: true
-};
-app.use(cors(corsOptions));
-
-// 3. Body Parser & Sanitization
-app.use(express.json({ limit: '10kb' })); 
-app.use(mongoSanitize()); 
-app.use(hpp()); 
-
-// 4. Rate Limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 100, 
-  message: 'Too many requests from this IP, please try again after 15 minutes'
-});
-if (process.env.NODE_ENV === 'production') {
-  app.use('/api', limiter);
-}
-
-// 5. Response Compression
+}));
 app.use(compression());
 
 // Routes
@@ -58,7 +33,7 @@ app.get('/', (req, res) => {
   res.send('API is running securely...');
 });
 
-// 6. Error Handling Middleware
+// 2. Error Handling Middleware
 app.use(notFound);
 app.use(errorHandler);
 
