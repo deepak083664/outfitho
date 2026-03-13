@@ -4,7 +4,7 @@ const orderSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
+      required: false,
       ref: 'User',
     },
     orderItems: [
@@ -83,6 +83,7 @@ const orderSchema = new mongoose.Schema(
 
 orderSchema.index({ isPaid: 1 });
 orderSchema.index({ isDelivered: 1 });
+orderSchema.index({ status: 1 });
 orderSchema.index({ createdAt: -1 });
 
 const Order = mongoose.model('Order', orderSchema);

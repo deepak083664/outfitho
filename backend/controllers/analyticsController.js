@@ -1,15 +1,25 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const User = require('../models/User');
+const NodeCache = require('node-cache');
+const adminCache = new NodeCache({ stdTTL: 300 }); // Cache for 5 minutes
 
 // @desc    Get dashboard analytics
-// @route   GET /api/orders/analytics
+// @route   GET /api/analytics
 // @access  Private/Admin
 const getAnalytics = async (req, res) => {
   try {
-    const totalOrders = await Order.countDocuments({ status: { $ne: 'Cancelled' } });
-    const totalProducts = await Product.countDocuments();
-    const totalUsers = await User.countDocuments();
+    const cacheKey = 'admin_dashboard_stats';
+    const cachedData = adminCache.get(cacheKey);
+    if (cachedData) {
+      return res.json(cachedData);
+    }
+
+    const [totalOrders, totalProducts, totalUsers] = await Promise.all([
+      Order.countDocuments({ status: { $ne: 'Cancelled' } }),
+      Product.countDocuments(),
+      User.countDocuments()
+    ]);
 
     // Calculate total revenue from all non-cancelled orders
     const revenueData = await Order.aggregate([
@@ -61,20 +71,22 @@ const getAnalytics = async (req, res) => {
       orders: data.orders
     }));
 
-    // Fill missing days with 0 if needed (Simple version: just return what we have)
-    // To be robust, we could ensure all 7 days are present
-
-    res.json({
+    const response = {
       totalRevenue,
       totalOrders,
       totalProducts,
       totalUsers,
       salesData: formattedSalesData.length > 0 ? formattedSalesData : [{ name: monthNames[new Date().getMonth()], sales: 0, orders: 0 }],
       weeklyData: formattedWeeklyData.length > 0 ? formattedWeeklyData : dayNames.map(day => ({ name: day, orders: 0 }))
-    });
+    };
+
+    adminCache.set(cacheKey, response);
+    res.json(response);
   } catch (error) {
+    console.error('Analytics Fetch Error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
 module.exports = { getAnalytics };
+
