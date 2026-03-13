@@ -10,9 +10,7 @@ const seedAdmin = async () => {
     console.log('MongoDB Connected for seeding...');
 
     // Try deleting any existing user with this email first to ensure fresh state
-    await User.deleteMany({ email: /Outfithoo@gmail.com/i });
-
-    const adminEmail = 'Outfithoo@gmail.com';
+    const adminEmail = 'outfitho@gmail.com';
     const adminPassword = 'outfitho123@';
 
     const admin = new User({
@@ -23,7 +21,7 @@ const seedAdmin = async () => {
     });
 
     await admin.save();
-    console.log('Admin user created successfully with email: outfithoo@gmail.com');
+    console.log('Admin user created successfully with email: outfitho@gmail.com');
     process.exit();
   } catch (error) {
     console.error('Error seeding admin:', error.message);
