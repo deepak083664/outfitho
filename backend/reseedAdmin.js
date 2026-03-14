@@ -1,13 +1,11 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 const User = require('./models/User');
-
-dotenv.config();
 
 const seedAdmin = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('MongoDB Connected for seeding...');
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+    console.log(`MongoDB Connected to DB: ${conn.connection.name} for seeding...`);
 
     // Try deleting any existing user with this email first to ensure fresh state
     await User.deleteMany({ email: /outfithoo@gmail.com/i });

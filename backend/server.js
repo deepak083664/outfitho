@@ -1,12 +1,9 @@
+require('dotenv').config();
 const express = require('express');
-const dotenv = require('dotenv');
 const cors = require('cors');
 const compression = require('compression');
 const connectDB = require('./config/db');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
-
-// Load environment variables
-dotenv.config();
 
 // Connect to MongoDB
 connectDB();
