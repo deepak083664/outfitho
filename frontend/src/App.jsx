@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
+import WhatsAppButton from './components/WhatsAppButton';
 
 // Context
 import { AuthProvider } from './context/AuthContext';
@@ -47,6 +48,7 @@ const StoreLayout = () => (
     <main className="flex-grow pt-[40px] lg:pt-[48px]">
       <Outlet />
     </main>
+    <WhatsAppButton />
     <Footer />
   </div>
 );
