@@ -27,7 +27,7 @@ const productSchema = new mongoose.Schema(
     image: { type: String, required: true },
     images: [String],
     brand: { type: String, required: true },
-    category: { type: String, required: true },
+    categories: { type: [String], required: true, default: [] },
     description: { type: String, required: true },
     materialCare: { type: String },
     shippingReturns: { type: String },
@@ -47,7 +47,7 @@ const productSchema = new mongoose.Schema(
 );
 
 productSchema.index({ name: 1 });
-productSchema.index({ category: 1 });
+productSchema.index({ categories: 1 });
 productSchema.index({ createdAt: -1 });
 
 const Product = mongoose.model('Product', productSchema);

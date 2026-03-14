@@ -35,22 +35,30 @@ const productCache = new NodeCache({ stdTTL: 60 }); // Cache for 60 seconds
 const getProducts = async (req, res) => {
   try {
     const category = req.query.category;
+    const keyword = req.query.keyword;
     const page = Number(req.query.pageNumber) || 1;
-    const pageSize = Number(req.query.pageSize) || 10;
+    const pageSize = Number(req.query.pageSize) || 12;
     
     // Create cache key based on query params
-    const cacheKey = `products_${category || 'all'}_${page}_${pageSize}`;
+    const cacheKey = `products_${category || 'all'}_${keyword || 'none'}_${page}_${pageSize}`;
     const cachedData = productCache.get(cacheKey);
     
     if (cachedData) {
       return res.json(cachedData);
     }
 
-    const filter = category ? { category } : {};
+    let filter = {};
+    if (category) filter.categories = category;
+    if (keyword) {
+      filter.$or = [
+        { name: { $regex: keyword, $options: 'i' } },
+        { description: { $regex: keyword, $options: 'i' } }
+      ];
+    }
     
     const count = await Product.countDocuments(filter);
     const products = await Product.find(filter)
-      .select('name price image category countInStock brand createdAt')
+      .select('name price image categories countInStock brand createdAt')
       .limit(pageSize)
       .skip(pageSize * (page - 1))
       .sort({ createdAt: -1 })
@@ -92,7 +100,7 @@ const createProduct = async (req, res) => {
       price,
       description,
       brand,
-      category,
+      categories,
       countInStock,
       sizes,
       materialCare,
@@ -114,7 +122,7 @@ const createProduct = async (req, res) => {
       image: uploadedImages.length > 0 ? uploadedImages[0] : '/placeholder.jpg',
       images: uploadedImages.length > 0 ? uploadedImages : ['/placeholder.jpg'],
       brand: brand || 'OUTFITHO',
-      category: category || '',
+      categories: categories ? (typeof categories === 'string' ? JSON.parse(categories) : categories) : [],
       countInStock: isNaN(Number(countInStock)) ? 0 : Number(countInStock),
       numReviews: 0,
       description: description || 'No description provided.',
@@ -156,7 +164,7 @@ const updateProduct = async (req, res) => {
       price,
       description,
       brand,
-      category,
+      categories,
       countInStock,
       sizes,
       materialCare,
@@ -182,7 +190,7 @@ const updateProduct = async (req, res) => {
       product.image = updatedImages.length > 0 ? updatedImages[0] : product.image;
       product.images = updatedImages.length > 0 ? updatedImages : product.images;
       product.brand = brand || product.brand;
-      product.category = category || product.category;
+      product.categories = categories ? (typeof categories === 'string' ? JSON.parse(categories) : categories) : product.categories;
       product.countInStock = countInStock !== undefined ? (isNaN(Number(countInStock)) ? product.countInStock : Number(countInStock)) : product.countInStock;
       product.materialCare = materialCare !== undefined ? materialCare : product.materialCare;
       product.shippingReturns = shippingReturns !== undefined ? shippingReturns : product.shippingReturns;
