@@ -1,25 +1,29 @@
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 
-// @desc    Auth user & get token
-// @route   POST /api/users/login
-// @access  Public
 const authUser = async (req, res) => {
-  const { email, password } = req.body;
+  let { email, password } = req.body;
+  email = email ? email.trim().toLowerCase() : '';
+  password = password ? password.trim() : '';
 
-  const user = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
+  const user = await User.findOne({ email });
 
-  if (user && (await user.matchPassword(password))) {
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      token: generateToken(user._id),
-    });
-  } else {
-    res.status(401).json({ message: 'Invalid email or password' });
+  if (user) {
+    const isMatch = await user.matchPassword(password);
+    
+    if (isMatch) {
+      res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+        token: generateToken(user._id),
+      });
+      return;
+    }
   }
+
+  res.status(401).json({ message: 'Invalid email or password' });
 };
 
 // @desc    Register a new user
