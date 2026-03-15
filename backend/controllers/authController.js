@@ -18,12 +18,13 @@ const authUser = async (req, res) => {
         email: user.email,
         isAdmin: user.isAdmin,
         token: generateToken(user._id),
+        buildVersion: 'v1.0.1-fixed-login'
       });
       return;
     }
   }
 
-  res.status(401).json({ message: 'Invalid email or password' });
+  res.status(401).json({ message: 'Invalid credentials. Please verify your email and password.' });
 };
 
 // @desc    Register a new user

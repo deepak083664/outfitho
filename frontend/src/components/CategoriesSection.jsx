@@ -48,26 +48,26 @@ const CategoriesSection = () => {
     <section className="pt-2 lg:pt-4 pb-0 bg-white overflow-hidden">
       <div className="container mx-auto px-4 lg:px-10">
         <div className="flex flex-col items-center mb-1 text-center">
-           <span className="text-[10px] font-black uppercase text-primary tracking-[0.4em]">Explore Collections</span>
+          <span className="text-[10px] font-black uppercase text-primary tracking-[0.4em]">Explore Collections</span>
         </div>
 
         {/* Categories Auto-Slider */}
-        <div 
+        <div
           ref={scrollRef}
           className="flex overflow-x-hidden space-x-4 lg:space-x-8 pb-0 no-scrollbar cursor-grab active:cursor-grabbing"
-          onMouseEnter={() => {}} // Could pause on hover if desired
+          onMouseEnter={() => { }} // Could pause on hover if desired
         >
           {displayCategories.map((cat, index) => (
-            <div 
+            <div
               key={`${cat.name}-${index}`}
               className="flex-shrink-0 flex flex-col items-center group cursor-pointer"
               onClick={() => navigate(`/shop?category=${cat.name}`)}
             >
               <div className="w-20 h-20 lg:w-36 lg:h-36 rounded-full overflow-hidden border-4 border-surface group-hover:border-primary shadow-xl transition-all duration-500 group-hover:scale-105 relative">
-                <img 
-                  src={cat.image} 
-                  alt={cat.name} 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                <img
+                  src={cat.image}
+                  alt={cat.name}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors"></div>
