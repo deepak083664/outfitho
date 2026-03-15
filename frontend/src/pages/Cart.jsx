@@ -8,6 +8,9 @@ const Cart = () => {
   const { cartItems, updateQty, removeFromCart } = useCart();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [isValidating, setIsValidating] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 800);
@@ -15,14 +18,36 @@ const Cart = () => {
   }, []);
 
   const handleCheckout = () => {
-    navigate('/checkout');
+    navigate('/checkout', { state: { appliedCoupon } });
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return;
+    try {
+      setIsValidating(true);
+      const { data } = await api.post('/coupons/validate', { code: couponCode });
+      setAppliedCoupon(data);
+      toast.success(`Coupon "${data.code}" applied!`);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Invalid coupon');
+      setAppliedCoupon(null);
+    } finally {
+      setIsValidating(false);
+    }
   };
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
-  const totalMrp = (cartItems.reduce((acc, item) => acc + (item.mrp || item.price * 1.3) * item.qty, 0));
-  const discountAmount = totalMrp - subtotal;
+  const totalMrp = cartItems.reduce((acc, item) => {
+    const discount = item.discount || 0;
+    const mrp = discount > 0 ? item.price / (1 - discount / 100) : item.price;
+    return acc + mrp * item.qty;
+  }, 0);
+  const bagDiscount = totalMrp - subtotal;
+  
+  const couponDiscount = appliedCoupon ? (subtotal * appliedCoupon.discountPercent) / 100 : 0;
+  
   const shipping = subtotal > 1500 ? 0 : 99;
-  const total = subtotal + shipping;
+  const total = subtotal - couponDiscount + shipping;
 
   if (cartItems.length === 0) {
     return (
@@ -99,11 +124,15 @@ const Cart = () => {
                          <div className="flex items-end justify-between mt-6 lg:mt-10">
                             <div className="flex flex-col lg:flex-row lg:items-baseline lg:space-x-3">
                                <span className="text-lg lg:text-3xl font-black text-dark tracking-tighter">₹{(item.price * item.qty).toLocaleString()}</span>
-                               <span className="text-[10px] lg:text-sm text-light line-through font-bold opacity-40">₹{Math.round((item.mrp || item.price * 1.3) * item.qty).toLocaleString()}</span>
+                               {item.discount > 0 && (
+                                 <span className="text-[10px] lg:text-sm text-light line-through font-bold opacity-40">₹{Math.round((item.price / (1 - item.discount / 100)) * item.qty).toLocaleString()}</span>
+                               )}
                             </div>
-                            <span className="hidden sm:inline-block text-[9px] lg:text-[10px] font-black text-green-600 uppercase tracking-widest bg-green-50 px-3 py-1.5 rounded-full border border-green-100/50">
-                               Save ₹{Math.round(((item.mrp || item.price * 1.3) - item.price) * item.qty).toLocaleString()}
-                            </span>
+                            {item.discount > 0 && (
+                               <span className="hidden sm:inline-block text-[9px] lg:text-[10px] font-black text-green-600 uppercase tracking-widest bg-green-50 px-3 py-1.5 rounded-full border border-green-100/50">
+                                 Save ₹{Math.round(((item.price / (1 - item.discount / 100)) - item.price) * item.qty).toLocaleString()}
+                               </span>
+                            )}
                          </div>
                       </div>
                    </div>
@@ -145,11 +174,17 @@ const Cart = () => {
                    <div className="flex gap-3">
                       <input 
                         type="text" 
-                        placeholder="SUMMER2026" 
-                        className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-xs font-bold placeholder:text-white/30 focus:outline-none focus:border-white/50 transition-all"
+                        placeholder="e.g. SUMMER20" 
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value)}
+                        className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-xs font-bold placeholder:text-white/30 focus:outline-none focus:border-white/50 transition-all uppercase"
                       />
-                      <button className="px-6 py-3 bg-white text-dark rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all">
-                        Apply
+                      <button 
+                        onClick={handleApplyCoupon}
+                        disabled={isValidating}
+                        className="px-6 py-3 bg-white text-dark rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all flex items-center justify-center min-w-[80px]"
+                      >
+                        {isValidating ? <Loader2 size={14} className="animate-spin" /> : 'Apply'}
                       </button>
                    </div>
                 </div>

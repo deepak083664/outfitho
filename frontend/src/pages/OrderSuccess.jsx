@@ -151,6 +151,7 @@ const OrderSuccess = () => {
                 <div className="flex justify-between items-center"><span className="text-[11px] font-bold text-[#666666] uppercase tracking-widest">Order ID</span><span className="text-xs font-black text-[#000000]">#{safeOrderId}</span></div>
                 <div className="flex justify-between items-center"><span className="text-[11px] font-bold text-[#666666] uppercase tracking-widest">Date</span><span className="text-xs font-black text-[#000000]">{safeOrderDate}</span></div>
                 <div className="flex justify-between items-center"><span className="text-[11px] font-bold text-[#666666] uppercase tracking-widest">Status</span><span className="text-[10px] font-black text-green-700 bg-green-50 px-3 py-1 rounded-full uppercase">Success</span></div>
+                <div className="flex justify-between items-center"><span className="text-[11px] font-bold text-[#666666] uppercase tracking-widest">Payment</span><span className="text-xs font-black text-[#000000] uppercase">{order?.paymentMethod || 'Paid'}</span></div>
               </div>
             </div>
 
@@ -205,6 +206,7 @@ const OrderSuccess = () => {
                   <div className="md:text-right flex flex-col justify-end">
                     <div className="space-y-1">
                        <div className="flex justify-between md:justify-end gap-10 items-center"><span className="text-[8px] font-bold uppercase tracking-widest" style={{ color: '#bbbbbb' }}>Status</span><span className="text-[9px] font-black uppercase" style={{ color: '#16a34a' }}>PAID - SUCCESS</span></div>
+                       <div className="flex justify-between md:justify-end gap-10 items-center"><span className="text-[8px] font-bold uppercase tracking-widest" style={{ color: '#bbbbbb' }}>Method</span><span className="text-[9px] font-black uppercase" style={{ color: '#000000' }}>{order?.paymentMethod || '--'}</span></div>
                        <div className="flex justify-between md:justify-end gap-10 items-center"><span className="text-[8px] font-bold uppercase tracking-widest" style={{ color: '#bbbbbb' }}>Currency</span><span className="text-[9px] font-black uppercase" style={{ color: '#000000' }}>INR (₹)</span></div>
                     </div>
                   </div>

@@ -104,7 +104,9 @@ const createProduct = async (req, res) => {
       countInStock,
       sizes,
       materialCare,
-      shippingReturns
+      shippingReturns,
+      discount,
+      rating
     } = req.body;
 
     let uploadedImages = [];
@@ -128,6 +130,8 @@ const createProduct = async (req, res) => {
       description: description || 'No description provided.',
       materialCare: materialCare || '',
       shippingReturns: shippingReturns || '',
+      discount: isNaN(Number(discount)) ? 0 : Number(discount),
+      rating: isNaN(Number(rating)) ? 0 : Number(rating),
       sizes: sizes ? (typeof sizes === 'string' ? JSON.parse(sizes) : sizes) : [],
     });
 
@@ -169,7 +173,9 @@ const updateProduct = async (req, res) => {
       sizes,
       materialCare,
       shippingReturns,
-      existingImages // Images already on Cloudinary (sent from frontend)
+      existingImages, // Images already on Cloudinary (sent from frontend)
+      discount,
+      rating
     } = req.body;
 
     const product = await Product.findById(req.params.id);
@@ -194,6 +200,8 @@ const updateProduct = async (req, res) => {
       product.countInStock = countInStock !== undefined ? (isNaN(Number(countInStock)) ? product.countInStock : Number(countInStock)) : product.countInStock;
       product.materialCare = materialCare !== undefined ? materialCare : product.materialCare;
       product.shippingReturns = shippingReturns !== undefined ? shippingReturns : product.shippingReturns;
+      product.discount = discount !== undefined ? (isNaN(Number(discount)) ? product.discount : Number(discount)) : product.discount;
+      product.rating = rating !== undefined ? (isNaN(Number(rating)) ? product.rating : Number(rating)) : product.rating;
       product.sizes = sizes ? (typeof sizes === 'string' ? JSON.parse(sizes) : sizes) : product.sizes;
 
       const updatedProduct = await product.save();

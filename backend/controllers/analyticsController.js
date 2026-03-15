@@ -15,69 +15,102 @@ const getAnalytics = async (req, res) => {
       return res.json(cachedData);
     }
 
+    // 1. Counters
     const [totalOrders, totalProducts, totalUsers] = await Promise.all([
       Order.countDocuments({ status: { $ne: 'Cancelled' } }),
       Product.countDocuments(),
       User.countDocuments()
     ]);
 
-    // Calculate total revenue from all non-cancelled orders
     const revenueData = await Order.aggregate([
       { $match: { status: { $ne: 'Cancelled' } } },
       { $group: { _id: null, total: { $sum: "$totalPrice" } } }
     ]);
     const totalRevenue = revenueData.length > 0 ? revenueData[0].total : 0;
 
-    // 1. Monthly Sales Data (Last 12 months)
-    const salesData = await Order.aggregate([
-      { $match: { status: { $ne: 'Cancelled' } } }, 
-      {
-        $group: {
-          _id: { month: { $month: "$createdAt" }, year: { $year: "$createdAt" } },
-          sales: { $sum: "$totalPrice" },
-          orders: { $sum: 1 }
-        }
+    // 2. Daily Sales Data (Last 30 Days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const dailySales = await Order.aggregate([
+      { 
+        $match: { 
+          createdAt: { $gte: thirtyDaysAgo },
+          status: { $ne: 'Cancelled' }
+        } 
       },
-      { $sort: { "_id.year": 1, "_id.month": 1 } },
-      { $limit: 12 }
-    ]);
-
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const formattedSalesData = salesData.map(data => ({
-      name: monthNames[data._id.month - 1],
-      sales: data.sales,
-      orders: data.orders
-    }));
-
-    // 2. Weekly Activity Data (Last 7 days)
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-    const weeklyData = await Order.aggregate([
-      { $match: { createdAt: { $gte: sevenDaysAgo }, status: { $ne: 'Cancelled' } } },
       {
         $group: {
-          _id: { $dayOfWeek: "$createdAt" },
-          orders: { $sum: 1 },
-          date: { $first: "$createdAt" }
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          sales: { $sum: "$totalPrice" }
         }
       },
       { $sort: { "_id": 1 } }
     ]);
 
-    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    const formattedWeeklyData = weeklyData.map(data => ({
-      name: dayNames[data._id - 1],
-      orders: data.orders
-    }));
+    // Fill in gaps for days with zero sales
+    const formattedDailySales = [];
+    for (let i = 29; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+        const dayMatch = dailySales.find(s => s._id === dateStr);
+        formattedDailySales.push({
+            date: dateStr,
+            label: d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
+            sales: dayMatch ? dayMatch.sales : 0
+        });
+    }
+
+    // 3. Top Selling Products
+    const topProductsData = await Order.aggregate([
+      { $match: { status: { $ne: 'Cancelled' } } },
+      { $unwind: "$orderItems" },
+      {
+        $group: {
+          _id: "$orderItems.name",
+          totalSold: { $sum: "$orderItems.qty" }
+        }
+      },
+      { $sort: { totalSold: -1 } },
+      { $limit: 7 }
+    ]);
+
+    // 4. User Demographics (New vs Returning)
+    // Definition: Returning = users with more than 1 order
+    const userStats = await Order.aggregate([
+        { $match: { status: { $ne: 'Cancelled' }, user: { $exists: true } } },
+        { $group: { _id: "$user", count: { $sum: 1 } } }
+    ]);
+
+    const returningCount = userStats.filter(u => u.count > 1).length;
+    const newCount = totalUsers - returningCount;
 
     const response = {
-      totalRevenue,
-      totalOrders,
-      totalProducts,
-      totalUsers,
-      salesData: formattedSalesData.length > 0 ? formattedSalesData : [{ name: monthNames[new Date().getMonth()], sales: 0, orders: 0 }],
-      weeklyData: formattedWeeklyData.length > 0 ? formattedWeeklyData : dayNames.map(day => ({ name: day, orders: 0 }))
+      counters: {
+          totalRevenue,
+          totalOrders,
+          totalProducts, // Added for extra insight
+          totalUsers
+      },
+      salesStats: {
+          series: [{
+              name: "Sales",
+              data: formattedDailySales.map(d => d.sales)
+          }],
+          categories: formattedDailySales.map(d => d.label)
+      },
+      topProducts: {
+          series: [{
+              name: "Units Sold",
+              data: topProductsData.map(p => p.totalSold)
+          }],
+          categories: topProductsData.map(p => p._id)
+      },
+      userDemographics: {
+          series: [returningCount, Math.max(0, newCount)],
+          labels: ["Returning Users", "New Users"]
+      }
     };
 
     adminCache.set(cacheKey, response);

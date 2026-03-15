@@ -1,5 +1,5 @@
 const express = require('express');
-const { getCoupons, createCoupon, deleteCoupon, toggleCouponStatus } = require('../controllers/couponController');
+const { getCoupons, createCoupon, deleteCoupon, toggleCouponStatus, validateCoupon, applyBulkDiscount } = require('../controllers/couponController');
 const { protect, admin } = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -13,5 +13,8 @@ router.route('/:id')
 
 router.route('/:id/toggle')
   .put(protect, admin, toggleCouponStatus);
+
+router.post('/validate', protect, validateCoupon);
+router.post('/bulk-discount', protect, admin, applyBulkDiscount);
 
 module.exports = router;

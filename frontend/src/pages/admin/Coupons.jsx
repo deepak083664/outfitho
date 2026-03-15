@@ -9,6 +9,8 @@ const Coupons = () => {
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({ code: '', discountPercent: '', expiresAt: '' });
+  const [bulkDiscount, setBulkDiscount] = useState('');
+  const [isBulkSubmitting, setIsBulkSubmitting] = useState(false);
 
   useEffect(() => {
     fetchCoupons();
@@ -69,6 +71,24 @@ const Coupons = () => {
       } catch (err) {
         toast.error('Failed to delete coupon');
       }
+    }
+  };
+
+  const handleApplyBulkDiscount = async (e) => {
+    e.preventDefault();
+    if (bulkDiscount === '' || isNaN(Number(bulkDiscount))) return;
+
+    if (!window.confirm(`This will apply a ${bulkDiscount}% discount to ALL products in your catalog. Proceed?`)) return;
+
+    try {
+      setIsBulkSubmitting(true);
+      const { data } = await api.post('/coupons/bulk-discount', { discountPercent: bulkDiscount });
+      toast.success(data.message);
+      setBulkDiscount('');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to apply bulk discount');
+    } finally {
+      setIsBulkSubmitting(false);
     }
   };
 
@@ -173,6 +193,40 @@ const Coupons = () => {
                 >
                   {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <><Plus size={18} className="mr-2" /> Activate Discount</>}
                 </button>
+             </form>
+          </div>
+
+          {/* Bulk Discount Section */}
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm mt-8 sticky top-[480px]">
+             <h3 className="text-lg font-semibold text-gray-900 mb-2">Bulk Discount</h3>
+             <p className="text-xs text-gray-500 mb-6 font-medium">Apply a global discount percentage to all products (e.g., for festivals).</p>
+             
+             <form onSubmit={handleApplyBulkDiscount} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Site-wide Discount (%)</label>
+                  <div className="relative">
+                     <input 
+                       type="number" 
+                       required
+                       min="0"
+                       max="100"
+                       value={bulkDiscount}
+                       onChange={(e) => setBulkDiscount(e.target.value)}
+                       className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-shadow"
+                       placeholder="e.g. 15"
+                     />
+                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">%</span>
+                  </div>
+                </div>
+                
+                <button 
+                  type="submit" 
+                  disabled={isBulkSubmitting}
+                  className="w-full bg-primary text-white py-2.5 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-black transition-all shadow-lg active:scale-95 flex items-center justify-center"
+                >
+                  {isBulkSubmitting ? <Loader2 size={18} className="animate-spin" /> : 'Apply to All Products'}
+                </button>
+                <p className="text-[10px] text-gray-400 text-center font-medium">Note: This overwrites individual product discounts.</p>
              </form>
           </div>
         </div>

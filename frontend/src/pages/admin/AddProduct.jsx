@@ -18,7 +18,9 @@ const AddProduct = () => {
     materialCare: '',
     shippingReturns: '',
     sizes: [], // will store { size: string, price: number }
-    brand: 'OUTFITHO'
+    brand: 'OUTFITHO',
+    discount: 0,
+    rating: 0
   });
 
   const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
@@ -72,6 +74,8 @@ const AddProduct = () => {
     data.append('materialCare', formData.materialCare);
     data.append('shippingReturns', formData.shippingReturns);
     data.append('sizes', JSON.stringify(formData.sizes));
+    data.append('discount', formData.discount);
+    data.append('rating', formData.rating);
 
     images.forEach((img) => {
       data.append('images', img.file);
@@ -128,6 +132,20 @@ const AddProduct = () => {
                   onChange={handleChange}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-shadow"
                   placeholder="e.g. Slim Fit Denim Jacket"
+                />
+              </div>
+              <div className="pt-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Manual Rating (0-5)</label>
+                <input 
+                  type="number" 
+                  name="rating"
+                  min="0"
+                  max="5"
+                  step="0.1"
+                  value={formData.rating}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-shadow"
+                  placeholder="0.0"
                 />
               </div>
               <div>
@@ -194,7 +212,7 @@ const AddProduct = () => {
                     <button 
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute top-1.5 right-1.5 bg-white shadow-md text-red-500 hover:text-red-700 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-20"
+                      className="absolute top-1.5 right-1.5 bg-white shadow-md text-red-500 hover:text-red-700 rounded-full p-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-20"
                     >
                       <X size={14} strokeWidth={3} />
                     </button>
@@ -251,6 +269,22 @@ const AddProduct = () => {
                   className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-shadow"
                   placeholder="0"
                 />
+              </div>
+              <div className="pt-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Discount Percentage (%)</label>
+                <div className="relative">
+                  <input 
+                    type="number" 
+                    name="discount"
+                    min="0"
+                    max="100"
+                    value={formData.discount}
+                    onChange={handleChange}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-shadow"
+                    placeholder="0"
+                  />
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">%</span>
+                </div>
               </div>
             </div>
           </div>

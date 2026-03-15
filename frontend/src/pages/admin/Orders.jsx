@@ -31,11 +31,18 @@ const OrderDetailsModal = ({ order, onClose }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center">
-                <User size={14} className="mr-2" /> Customer Info
+                <User size={14} className="mr-2" /> Customer Details
               </h3>
-              <div className="p-4 bg-gray-50 rounded-xl border border-gray-100">
-                <p className="font-bold text-dark">{order.user?.name || 'Guest User'}</p>
-                <p className="text-xs text-secondary font-medium">{order.user?.email || 'N/A'}</p>
+              <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 space-y-1.5">
+                <p className="font-bold text-dark">{order.shippingAddress?.fullName || order.user?.name || 'Guest User'}</p>
+                <div className="flex flex-col space-y-1">
+                   <p className="text-xs text-secondary font-medium flex items-center">
+                     <span className="opacity-50 mr-2">Email:</span> {order.user?.email || 'N/A'}
+                   </p>
+                   <p className="text-xs text-secondary font-medium flex items-center">
+                     <span className="opacity-50 mr-2">Phone:</span> {order.shippingAddress?.phone || 'N/A'}
+                   </p>
+                </div>
               </div>
             </div>
 
@@ -44,6 +51,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
                 <MapPin size={14} className="mr-2" /> Shipping Address
               </h3>
               <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 text-xs font-medium leading-relaxed">
+                <p className="font-bold mb-1">{order.shippingAddress?.fullName}</p>
                 <p>{order.shippingAddress.address}</p>
                 <p>{order.shippingAddress.city}, {order.shippingAddress.postalCode}</p>
                 <p>{order.shippingAddress.country}</p>
@@ -53,7 +61,7 @@ const OrderDetailsModal = ({ order, onClose }) => {
 
           <div className="space-y-4">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 flex items-center">
-              <CreditCard size={14} className="mr-2" /> Order Items
+              <Package size={14} className="mr-2" /> Order Items
             </h3>
             <div className="border border-gray-100 rounded-xl overflow-hidden">
                {order.orderItems.map((item, idx) => (
@@ -73,10 +81,10 @@ const OrderDetailsModal = ({ order, onClose }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-6 pt-4 border-t border-gray-100">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-4 border-t border-gray-100">
              <div>
                 <p className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-400 mb-1">Status</p>
-                <span className={`text-[10px] font-black px-2 py-1 rounded-full border ${
+                <span className={`text-[10px] font-black px-2 py-1 rounded-full border inline-block ${
                   order.status === 'Delivered' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 
                   order.status === 'Cancelled' ? 'bg-red-50 text-red-700 border-red-100' : 'bg-amber-50 text-amber-700 border-amber-100'
                 }`}>
@@ -84,12 +92,19 @@ const OrderDetailsModal = ({ order, onClose }) => {
                 </span>
              </div>
              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-400 mb-1">Date</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-400 mb-1">Order Date</p>
                 <p className="text-xs font-bold text-dark uppercase">{new Date(order.createdAt).toLocaleDateString()}</p>
              </div>
-             <div className="md:text-right">
-                <p className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-400 mb-1">Total Paid</p>
-                <p className="text-lg font-black text-dark">₹{order.totalPrice.toLocaleString()}</p>
+             <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-400 mb-1">Payment</p>
+                <div className="flex items-center text-xs font-bold text-dark uppercase">
+                   <CreditCard size={12} className="mr-1.5 opacity-50" />
+                   {order.paymentMethod}
+                </div>
+             </div>
+             <div className="text-right">
+                <p className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-400 mb-1">Grand Total</p>
+                <p className="text-lg font-black text-dark tracking-tighter">₹{order.totalPrice.toLocaleString()}</p>
              </div>
           </div>
         </div>

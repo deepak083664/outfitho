@@ -122,7 +122,7 @@ const Products = () => {
       }
     },
     { 
-      header: '', 
+      header: 'Actions', 
       render: (row) => (
         <div className="flex items-center justify-end space-x-1">
           <Link to={`/admin/products/edit/${row._id}`} className="p-2 text-gray-400 hover:text-black hover:bg-gray-100 rounded-xl transition-all">

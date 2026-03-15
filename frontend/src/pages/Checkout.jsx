@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, ShieldCheck, Truck, CreditCard, Smartphone, ChevronRight, Lock, MapPin, Package, MoreHorizontal, Sparkles } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { ArrowLeft, Check, ShieldCheck, Truck, CreditCard, Smartphone, ChevronRight, Lock, MapPin, Package, MoreHorizontal, Sparkles, Tag } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useCart } from '../context/CartContext';
 import api from '../services/api';
@@ -9,7 +9,9 @@ const Checkout = () => {
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState('card');
   const navigate = useNavigate();
+  const location = useLocation();
   const { cartItems, clearCart } = useCart();
+  const appliedCoupon = location.state?.appliedCoupon || null;
   const [loading, setLoading] = useState(false);
   const [isOrdered, setIsOrdered] = useState(false);
   
@@ -23,7 +25,9 @@ const Checkout = () => {
   const [contactNo, setContactNo] = useState('');
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
-  const total = subtotal; // Assuming free shipping for now
+  const couponDiscount = appliedCoupon ? (subtotal * appliedCoupon.discountPercent) / 100 : 0;
+  const shipping = subtotal > 1500 ? 0 : 99;
+  const total = subtotal - couponDiscount + shipping;
 
   useEffect(() => {
     if (cartItems.length === 0 && !isOrdered) {
@@ -58,9 +62,11 @@ const Checkout = () => {
         },
         fullName,
         paymentMethod: paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment',
-        shippingPrice: 0,
+        shippingPrice: shipping,
         taxPrice: 0,
-        totalPrice: total
+        totalPrice: total,
+        couponCode: appliedCoupon?.code,
+        couponDiscount: couponDiscount
       };
 
       const { data } = await api.post('/orders', orderData);

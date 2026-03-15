@@ -14,7 +14,7 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="w-full bg-white py-1">
+    <div className="w-full bg-white py-0.5">
       <div className="container mx-auto px-4 lg:px-20">
         <form 
           onSubmit={handleSubmit}
@@ -25,10 +25,10 @@ const SearchBar = () => {
           </div>
           <input
             type="text"
-            placeholder="Search for premium fits, denim, or accessories..."
+            placeholder="search products"
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
-            className="w-full bg-surface border border-transparent focus:bg-white focus:border-dark px-12 py-3 rounded-full text-xs font-bold uppercase tracking-widest placeholder:text-gray-400 focus:outline-none transition-all duration-300 shadow-sm focus:shadow-xl"
+            className="w-full bg-surface border border-transparent focus:bg-white focus:border-dark px-12 py-1.5 rounded-full text-xs font-normal tracking-wide placeholder:text-gray-400 placeholder:italic focus:outline-none transition-all duration-300 shadow-sm focus:shadow-xl"
           />
           {keyword && (
             <button

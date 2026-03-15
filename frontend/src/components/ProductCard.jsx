@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { WishlistButton, AddToCartButton } from './ActionButtons';
 
 const ProductCard = ({ product }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const images = product.images && product.images.length > 0 ? product.images : [product.image || '/placeholder-product.jpg'];
-  const discount = product.discount || 30;
-  const originalPrice = Math.round(product.price * (1 + discount / 100));
+  const discount = product.discount || 0;
+  const originalPrice = discount > 0 ? Math.round(product.price / (1 - discount / 100)) : product.price;
 
   const nextImage = (e) => {
     e.preventDefault();
@@ -85,11 +85,18 @@ const ProductCard = ({ product }) => {
         </div>
       </div>
 
-      {/* Info Area */}
       <div className="p-2 lg:p-2.5 space-y-0.5">
-        <h3 className="text-[8px] font-black uppercase text-light tracking-widest opacity-70">
-          {product.brand || 'OUTFITHO'}
-        </h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-[8px] font-black uppercase text-light tracking-widest opacity-70">
+            {product.brand || 'OUTFITHO'}
+          </h3>
+          {product.rating > 0 && (
+            <div className="flex items-center space-x-1 bg-surface/50 px-1.5 py-0.5 rounded flex-shrink-0">
+               <Star size={8} className="fill-yellow-500 text-yellow-500" />
+               <span className="text-[8px] font-black text-dark">{product.rating}</span>
+            </div>
+          )}
+        </div>
         <Link to={`/product/${product._id}`}>
           <h2 className="text-[11px] lg:text-xs font-bold text-dark truncate hover:text-primary transition-colors cursor-pointer leading-tight">
             {product.name}

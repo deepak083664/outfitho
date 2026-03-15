@@ -10,7 +10,8 @@ import {
   Settings, 
   X,
   Store,
-  LogOut
+  LogOut,
+  BarChart2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -27,8 +28,10 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+    { name: 'Analytics', href: '/admin/analytics', icon: BarChart2 },
     { name: 'Products', href: '/admin/products', icon: ShoppingBag },
     { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
+    { name: 'Coupons', href: '/admin/coupons', icon: Ticket },
     { name: 'Customers', href: '/admin/users', icon: Users },
   ];
 

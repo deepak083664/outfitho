@@ -3,7 +3,7 @@ import React from 'react';
 const ModernTable = ({ columns, data, emptyMessage = "No data found." }) => {
   return (
     <div className="w-full bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      <div className="overflow-x-auto lg:overflow-visible custom-scrollbar">
+      <div className="overflow-x-auto custom-scrollbar">
         {/* Mobile View: Cards */}
         <div className="grid grid-cols-1 gap-4 p-4 lg:hidden">
           {data.length === 0 ? (

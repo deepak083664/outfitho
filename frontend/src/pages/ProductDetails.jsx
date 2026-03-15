@@ -64,7 +64,8 @@ const ProductDetails = () => {
   if (!product) return null;
 
   const images = product.images && product.images.length > 0 ? product.images : [product.image || '/placeholder-product.jpg'];
-  const discount = product.discount || Math.round(((product.mrp - product.price) / product.mrp) * 100) || 0;
+  const discount = product.discount || 0;
+  const originalPrice = discount > 0 ? Math.round(product.price / (1 - discount / 100)) : product.price;
 
   return (
     <div className="bg-white min-h-screen pb-32 lg:pb-20">
@@ -176,11 +177,11 @@ const ProductDetails = () => {
                   
                   <div className="flex items-baseline space-x-6">
                     <span className="text-4xl lg:text-5xl font-black text-dark">
-                      ₹{selectedSize ? product.sizes.find(s => s.size === selectedSize)?.price : product.price}
+                      ₹{(selectedSize ? product.sizes.find(s => s.size === selectedSize)?.price : product.price).toLocaleString()}
                     </span>
-                    {product.mrp > product.price && (
+                    {discount > 0 && (
                       <>
-                        <span className="text-xl text-light line-through font-medium">₹{product.mrp}</span>
+                        <span className="text-xl text-light line-through font-medium">₹{Math.round((selectedSize ? product.sizes.find(s => s.size === selectedSize)?.price : product.price) / (1 - discount / 100)).toLocaleString()}</span>
                         <span className="text-xl text-primary font-black animate-pulse">-{discount}%</span>
                       </>
                     )}
@@ -264,8 +265,8 @@ const ProductDetails = () => {
                <span className="text-xs font-black text-dark">
                  ₹{(selectedSize ? product.sizes.find(s => s.size === selectedSize)?.price : product.price).toLocaleString()}
                </span>
-               {product.mrp > product.price && (
-                <span className="text-[10px] font-bold text-light line-through opacity-50">₹{product.mrp.toLocaleString()}</span>
+               {discount > 0 && (
+                <span className="text-[10px] font-bold text-light line-through opacity-50">₹{Math.round((selectedSize ? product.sizes.find(s => s.size === selectedSize)?.price : product.price) / (1 - discount / 100)).toLocaleString()}</span>
                )}
             </div>
             {discount > 0 && (
