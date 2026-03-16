@@ -48,6 +48,9 @@ export const AddToCartButton = ({ product, className = "" }) => {
 
     setLoading(true);
     try {
+      if (!product || !product._id) {
+        throw new Error('Invalid product');
+      }
       // Direct add for Guest Flow
       addToCart(product);
     } catch (error) {

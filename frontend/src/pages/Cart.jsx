@@ -200,7 +200,7 @@ const Cart = () => {
                       </div>
                       <div className="flex justify-between items-center text-xs lg:text-sm">
                          <span className="font-bold text-secondary">Bag Discount</span>
-                         <span className="font-black text-green-600">− ₹{Math.round(discountAmount).toLocaleString()}</span>
+                         <span className="font-black text-green-600">− ₹{Math.round(bagDiscount).toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between items-center text-xs lg:text-sm">
                          <div className="flex items-center space-x-2">

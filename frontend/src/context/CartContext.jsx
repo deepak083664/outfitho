@@ -6,23 +6,39 @@ export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(() => {
-    const savedCart = localStorage.getItem('cart');
-    return savedCart ? JSON.parse(savedCart) : [];
+    try {
+      const savedCart = localStorage.getItem('cart');
+      const parsed = savedCart ? JSON.parse(savedCart) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      console.error('Error loading cart from localStorage:', error);
+      return [];
+    }
   });
 
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
+    try {
+      localStorage.setItem('cart', JSON.stringify(cartItems));
+    } catch (error) {
+      console.error('Error saving cart to localStorage:', error);
+    }
   }, [cartItems]);
 
   const addToCart = (product, qty = 1, size = 'M') => {
+    if (!product || !product._id) {
+      console.error('Invalid product passed to addToCart:', product);
+      return;
+    }
+
     setCartItems((prevItems) => {
-      const existItem = prevItems.find((x) => x._id === product._id && x.size === size);
+      const items = Array.isArray(prevItems) ? prevItems : [];
+      const existItem = items.find((x) => x._id === product._id && x.size === size);
       if (existItem) {
-        return prevItems.map((x) =>
+        return items.map((x) =>
           x._id === product._id && x.size === size ? { ...x, qty: x.qty + qty } : x
         );
       }
-      return [...prevItems, { ...product, qty, size }];
+      return [...items, { ...product, qty, size }];
     });
   };
 
