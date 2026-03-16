@@ -24,7 +24,11 @@ const Coupons = () => {
         ...c,
         discount: c.discountPercent,
         expiryFormatted: c.expiresAt ? new Date(c.expiresAt).toLocaleDateString() : 'No Limit',
-        status: new Date(c.expiresAt) < new Date() ? 'Expired' : (c.isActive ? 'Active' : 'Disabled')
+        status: (() => {
+          const expiry = new Date(c.expiresAt);
+          expiry.setHours(23, 59, 59, 999);
+          return expiry < new Date() ? 'Expired' : (c.isActive ? 'Active' : 'Disabled');
+        })()
       })));
     } catch (err) {
       toast.error('Failed to load coupons');
@@ -117,7 +121,7 @@ const Coupons = () => {
     { 
       header: 'Status', 
       render: (row) => (
-        <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${row.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+        <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${row.status === 'Active' ? 'bg-green-100 text-green-700' : row.status === 'Expired' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'}`}>
           {row.status}
         </span>
       )

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Trash2, ShoppingBag, X, ShieldCheck, ChevronRight, Info, Plus, Minus, Tag, Truck, CreditCard, Sparkles } from 'lucide-react';
+import { Trash2, ShoppingBag, X, ShieldCheck, ChevronRight, Info, Plus, Minus, Tag, Truck, CreditCard, Sparkles, Loader2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useCart } from '../context/CartContext';
+import api from '../services/api';
 
 const Cart = () => {
   const { cartItems, updateQty, removeFromCart } = useCart();
