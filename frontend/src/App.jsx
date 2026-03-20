@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Outlet, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -43,16 +43,22 @@ import AdminLogin from './pages/admin/Login';
 import AdminBanners from './pages/admin/Banners';
 
 // Layout for the Customer-facing store
-const StoreLayout = () => (
-  <div className="flex flex-col min-h-screen">
-    <Navbar />
-    <main className="flex-grow pt-[40px] lg:pt-[48px]">
-      <Outlet />
-    </main>
-    <WhatsAppButton />
-    <Footer />
-  </div>
-);
+const StoreLayout = () => {
+  const location = useLocation();
+  const hiddenPaths = ['/cart', '/checkout', '/order-success', '/orders'];
+  const showWhatsApp = !hiddenPaths.some(path => location.pathname.startsWith(path));
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
+      <main className="flex-grow pt-[40px] lg:pt-[48px]">
+        <Outlet />
+      </main>
+      {showWhatsApp && <WhatsAppButton />}
+      <Footer />
+    </div>
+  );
+};
 
 const App = () => {
   return (
