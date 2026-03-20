@@ -36,6 +36,7 @@ app.use('/api/categories', require('./routes/categoryRoutes'));
 app.use('/api/coupons', require('./routes/couponRoutes'));
 app.use('/api/analytics', require('./routes/analyticsRoutes'));
 app.use('/api/banners', require('./routes/bannerRoutes'));
+app.use('/api/razorpay', require('./routes/razorpayRoutes'));
 
 app.get('/', (req, res) => {
   res.send('API is running securely...');

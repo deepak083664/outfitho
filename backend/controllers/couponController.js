@@ -73,16 +73,20 @@ const toggleCouponStatus = async (req, res) => {
 const validateCoupon = async (req, res) => {
   try {
     const { code } = req.body;
-    const coupon = await Coupon.findOne({ code: code.toUpperCase(), isActive: true });
+    const coupon = await Coupon.findOne({ code: code.toUpperCase() });
 
     if (!coupon) {
-      return res.status(404).json({ message: 'Invalid or inactive coupon code' });
+      return res.status(404).json({ message: 'Invalid Coupon' });
     }
 
     const expirationDate = new Date(coupon.expiresAt);
     expirationDate.setHours(23, 59, 59, 999);
     if (expirationDate < new Date()) {
-      return res.status(400).json({ message: 'Coupon has expired' });
+      return res.status(400).json({ message: 'Expired Coupon' });
+    }
+
+    if (!coupon.isActive) {
+      return res.status(400).json({ message: 'Invalid Coupon' });
     }
 
     res.json({
