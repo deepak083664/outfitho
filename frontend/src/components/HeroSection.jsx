@@ -100,13 +100,25 @@ const HeroSection = () => {
 
           {/* Content Area */}
           <div className="absolute inset-0 flex flex-col justify-center pt-10 lg:pt-20 px-6 lg:px-32 z-20">
-             <div className={`max-w-3xl transition-all duration-1000 delay-500 ${
+             <div className={`max-w-4xl transition-all duration-1000 delay-500 ${
                 index === current ? 'translate-x-0 opacity-100' : '-translate-x-20 opacity-0'
              }`}>
+                {slide.subtitle && (
+                  <span className="inline-block text-white font-black tracking-[0.3em] text-[10px] lg:text-xs uppercase mb-3 lg:mb-5 drop-shadow-lg opacity-90 border-l-2 border-white pl-3">
+                    {slide.subtitle}
+                  </span>
+                )}
+                
                 <h1 
-                  className="text-white text-3xl lg:text-8xl font-black uppercase tracking-tighter leading-[0.85] mb-6 lg:mb-10 drop-shadow-2xl"
+                  className="text-white text-4xl lg:text-8xl font-black uppercase tracking-tighter leading-[0.85] mb-4 lg:mb-6 drop-shadow-2xl"
                   dangerouslySetInnerHTML={{ __html: slide.title }}
                 ></h1>
+                
+                {slide.desc && (
+                  <p className="text-white/80 text-xs lg:text-base font-medium max-w-xs lg:max-w-xl mb-8 lg:mb-10 leading-relaxed drop-shadow-lg">
+                    {slide.desc}
+                  </p>
+                )}
                 
                 <button 
                   onClick={() => navigate('/shop')}

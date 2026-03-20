@@ -47,7 +47,7 @@ const Cart = () => {
   
   const couponDiscount = appliedCoupon ? (subtotal * appliedCoupon.discountPercent) / 100 : 0;
   
-  const shipping = subtotal > 1500 ? 0 : 99;
+  const shipping = 0;
   const total = subtotal - couponDiscount + shipping;
 
   if (cartItems.length === 0) {

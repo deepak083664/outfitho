@@ -85,7 +85,7 @@ const validateCoupon = async (req, res) => {
       return res.status(400).json({ message: 'Expired Coupon' });
     }
 
-    if (!coupon.isActive) {
+    if (coupon.isActive === false) {
       return res.status(400).json({ message: 'Invalid Coupon' });
     }
 

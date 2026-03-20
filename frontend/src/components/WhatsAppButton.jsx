@@ -14,13 +14,13 @@ const WhatsAppButton = () => {
             animate={{ scale: 1, opacity: 1 }}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="fixed bottom-6 right-6 z-[9999] flex items-center justify-center w-14 h-14 bg-[#25D366] rounded-full shadow-2xl transition-shadow hover:shadow-[0_0_20px_rgba(37,211,102,0.6)] group"
+            className="fixed bottom-6 right-6 z-[9999] flex items-center justify-center w-10 h-10 bg-[#25D366] rounded-full shadow-2xl transition-shadow hover:shadow-[0_0_20px_rgba(37,211,102,0.6)] group"
             aria-label="Contact us on WhatsApp"
         >
             <svg
                 viewBox="0 0 24 24"
-                width="32"
-                height="32"
+                width="24"
+                height="24"
                 fill="white"
                 className="group-hover:scale-110 transition-transform duration-300"
             >

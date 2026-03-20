@@ -5,9 +5,19 @@ import { toast } from 'react-toastify';
 import { useCart } from '../context/CartContext';
 import api from '../services/api';
 
+const loadScript = (src) => {
+  return new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 const Checkout = () => {
   const [step, setStep] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [paymentMethod, setPaymentMethod] = useState('upi');
   const navigate = useNavigate();
   const location = useLocation();
   const { cartItems, clearCart } = useCart();
@@ -26,7 +36,7 @@ const Checkout = () => {
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
   const couponDiscount = appliedCoupon ? (subtotal * appliedCoupon.discountPercent) / 100 : 0;
-  const shipping = subtotal > 1500 ? 0 : 99;
+  const shipping = 0;
   const total = subtotal - couponDiscount + shipping;
 
   useEffect(() => {
@@ -69,26 +79,95 @@ const Checkout = () => {
         couponDiscount: couponDiscount
       };
 
-      const { data } = await api.post('/orders', orderData);
-      toast.success('Order placed successfully!');
-      
-      // Persist orderId and Name for the success page
-      localStorage.setItem('lastOrderId', data._id);
-      localStorage.setItem('lastOrderCustomerName', fullName);
-      
-      setIsOrdered(true);
-      clearCart();
-      
-      // Delay navigation slightly to ensure state is cleared and toasts are visible
-      setTimeout(() => {
-        navigate('/order-success', { state: { orderId: data._id } });
-      }, 300);
+      if (paymentMethod === 'upi') {
+        const { data } = await api.post('/orders', orderData);
+        
+        const res = await loadScript('https://checkout.razorpay.com/v1/checkout.js');
+        if (!res) {
+          toast.error('Razorpay SDK failed to load. Are you online?');
+          setLoading(false);
+          return;
+        }
+
+        const { data: { key } } = await api.get('/razorpay/key');
+        const rzpOrderRes = await api.post('/razorpay/create-order', {
+          amount: total,
+          receipt: data._id
+        });
+        const rzpOrder = rzpOrderRes.data;
+        
+        const options = {
+          key: key,
+          amount: rzpOrder.amount,
+          currency: "INR",
+          name: "OutfitHo",
+          description: "Order Payment",
+          order_id: rzpOrder.id,
+          handler: async function (response) {
+            try {
+              const verifyRes = await api.post('/razorpay/verify', {
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpayOrderId: response.razorpay_order_id,
+                razorpaySignature: response.razorpay_signature,
+                outfithoOrderId: data._id,
+                orderCreationId: rzpOrder.id
+              });
+              
+              toast.success(verifyRes.data.message || 'Payment Successful!');
+              localStorage.setItem('lastOrderId', data._id);
+              localStorage.setItem('lastOrderCustomerName', fullName);
+              setIsOrdered(true);
+              clearCart();
+              setTimeout(() => {
+                navigate('/order-success', { state: { orderId: data._id } });
+              }, 300);
+            } catch(e) {
+                console.error(e);
+                toast.error('Payment Verification Failed');
+                setLoading(false);
+            }
+          },
+          prefill: {
+            name: fullName,
+            contact: contactNo
+          },
+          theme: {
+            color: "#ff3366",
+          },
+          modal: {
+            ondismiss: function() {
+              setLoading(false);
+            }
+          }
+        };
+
+        const paymentObject = new window.Razorpay(options);
+        paymentObject.on('payment.failed', function (response){
+          toast.error(response.error.description || 'Payment Failed');
+          setLoading(false);
+        });
+        paymentObject.open();
+
+      } else {
+        const { data } = await api.post('/orders', orderData);
+        toast.success('Order placed successfully!');
+        
+        localStorage.setItem('lastOrderId', data._id);
+        localStorage.setItem('lastOrderCustomerName', fullName);
+        
+        setIsOrdered(true);
+        clearCart();
+        
+        setTimeout(() => {
+          navigate('/order-success', { state: { orderId: data._id } });
+        }, 300);
+      }
     } catch (err) {
       console.error('Checkout error:', err);
       toast.error(err.response?.data?.message || 'Failed to place order');
-    } finally {
       setLoading(false);
     }
+    // Note: finally { setLoading(false) } is removed because Razorpay popup is async and we need to keep loading true until success/dismissal
   };
 
   return (
@@ -216,7 +295,6 @@ const Checkout = () => {
                        
                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
                           {[
-                             { id: 'card', name: 'Card', icon: CreditCard, subtitle: 'Secure' },
                              { id: 'upi', name: 'UPI', icon: Smartphone, subtitle: 'Instant' },
                              { id: 'cod', name: 'COD', icon: Truck, subtitle: 'Cash' },
                           ].map((method) => (

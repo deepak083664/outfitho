@@ -179,8 +179,7 @@ const OrderSuccess = () => {
                     <h2 className="text-2xl font-black tracking-tighter uppercase mb-2" style={{ color: '#000000' }}>OUTFITHO<span style={{ color: '#ff3366' }}>.</span></h2>
                     <div className="space-y-1">
                       <p className="text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: '#000000' }}>Precision Fit | Modern Luxe</p>
-                      <p className="text-[8px] font-bold" style={{ color: '#666666' }}>Regd. Office: 123 Fashion Street, SE-1</p>
-                      <p className="text-[8px] font-black uppercase tracking-widest mt-1" style={{ color: '#ff3366' }}>Outifithoo@gmail.com</p>
+                      <p className="text-[8px] font-black uppercase tracking-widest mt-1" style={{ color: '#ff3366' }}>outfithoo8@gmail.com</p>
                     </div>
                   </div>
                   <div className="text-left sm:text-right">
