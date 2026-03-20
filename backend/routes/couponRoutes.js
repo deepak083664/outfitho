@@ -14,7 +14,7 @@ router.route('/:id')
 router.route('/:id/toggle')
   .put(protect, admin, toggleCouponStatus);
 
-router.post('/validate', protect, validateCoupon);
+router.post('/validate', validateCoupon);
 router.post('/bulk-discount', protect, admin, applyBulkDiscount);
 
 module.exports = router;
