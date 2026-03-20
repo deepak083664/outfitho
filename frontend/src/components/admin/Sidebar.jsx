@@ -11,7 +11,8 @@ import {
   X,
   Store,
   LogOut,
-  BarChart2
+  BarChart2,
+  Image as ImageIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -33,6 +34,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     { name: 'Orders', href: '/admin/orders', icon: ShoppingCart },
     { name: 'Coupons', href: '/admin/coupons', icon: Ticket },
     { name: 'Customers', href: '/admin/users', icon: Users },
+    { name: 'Banners', href: '/admin/banners', icon: ImageIcon },
   ];
 
   const bottomNav = [

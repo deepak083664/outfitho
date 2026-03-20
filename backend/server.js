@@ -12,8 +12,18 @@ const app = express();
 
 // 1. Basic Middlewares
 app.use(express.json()); 
+const allowedOrigins = process.env.FRONTEND_URL 
+  ? process.env.FRONTEND_URL.split(',') 
+  : ['*'];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(compression());
@@ -25,6 +35,7 @@ app.use('/api/orders', require('./routes/orderRoutes'));
 app.use('/api/categories', require('./routes/categoryRoutes'));
 app.use('/api/coupons', require('./routes/couponRoutes'));
 app.use('/api/analytics', require('./routes/analyticsRoutes'));
+app.use('/api/banners', require('./routes/bannerRoutes'));
 
 app.get('/', (req, res) => {
   res.send('API is running securely...');

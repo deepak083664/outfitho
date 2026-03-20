@@ -40,6 +40,7 @@ import AdminReviews from './pages/admin/Reviews';
 import AdminAnalytics from './pages/admin/Analytics';
 import AdminSettings from './pages/admin/Settings';
 import AdminLogin from './pages/admin/Login';
+import AdminBanners from './pages/admin/Banners';
 
 // Layout for the Customer-facing store
 const StoreLayout = () => (
@@ -89,6 +90,7 @@ const App = () => {
                 <Route path="reviews" element={<AdminReviews />} />
                 <Route path="analytics" element={<AdminAnalytics />} />
                 <Route path="settings" element={<AdminSettings />} />
+                <Route path="banners" element={<AdminBanners />} />
               </Route>
             </Routes>
           </Router>

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import api from '../services/api';
 
-const slides = [
+const defaultSlides = [
   {
     id: 1,
     title: "UNLEASH <br /> YOUR <br /> STYLE",
@@ -38,13 +39,39 @@ const slides = [
 const HeroSection = () => {
   const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
+  const [slides, setSlides] = useState(defaultSlides);
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const res = await api.get('/banners');
+        if (res.data && res.data.length > 0) {
+          const mappedBanners = res.data.map(banner => ({
+            id: banner._id,
+            title: banner.title || '',
+            subtitle: banner.subtitle || '',
+            desc: banner.desc || '',
+            mobileImage: banner.image,
+            desktopImage: banner.image, // Using the same image for both
+            overlay: "bg-black/10",
+            accent: "text-primary"
+          }));
+          setSlides(mappedBanners);
+        }
+      } catch (error) {
+        console.error("Failed to fetch banners", error);
+      }
+    };
+
+    fetchBanners();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [slides.length]);
 
   const nextSlide = () => setCurrent((prev) => (prev + 1) % slides.length);
   const prevSlide = () => setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
