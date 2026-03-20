@@ -79,7 +79,9 @@ const validateCoupon = async (req, res) => {
       return res.status(404).json({ message: 'Invalid or inactive coupon code' });
     }
 
-    if (coupon.expiresAt < new Date()) {
+    const expirationDate = new Date(coupon.expiresAt);
+    expirationDate.setHours(23, 59, 59, 999);
+    if (expirationDate < new Date()) {
       return res.status(400).json({ message: 'Coupon has expired' });
     }
 

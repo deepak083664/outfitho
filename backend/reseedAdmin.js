@@ -8,7 +8,7 @@ const seedAdmin = async () => {
     console.log(`MongoDB Connected to DB: ${conn.connection.name} for seeding...`);
 
     // Try deleting any existing user with this email first to ensure fresh state
-    await User.deleteMany({ email: /Outfithoo@gmail.com/i });
+    await User.deleteMany({ email: /outfithoo@gmail.com/i });
 
     const adminEmail = 'outfithoo@gmail.com';
     const adminPassword = 'outfithoo123@';
