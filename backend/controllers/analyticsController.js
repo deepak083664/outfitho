@@ -1,8 +1,7 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const User = require('../models/User');
-const NodeCache = require('node-cache');
-const adminCache = new NodeCache({ stdTTL: 300 }); // Cache for 5 minutes
+const adminCache = require('../utils/adminCache');
 
 // @desc    Get dashboard analytics
 // @route   GET /api/analytics
@@ -17,13 +16,13 @@ const getAnalytics = async (req, res) => {
 
     // 1. Counters
     const [totalOrders, totalProducts, totalUsers] = await Promise.all([
-      Order.countDocuments({ status: { $ne: 'Cancelled' } }),
+      Order.countDocuments({ status: 'Delivered' }),
       Product.countDocuments(),
       User.countDocuments()
     ]);
 
     const revenueData = await Order.aggregate([
-      { $match: { status: { $ne: 'Cancelled' } } },
+      { $match: { status: 'Delivered' } },
       { $group: { _id: null, total: { $sum: "$totalPrice" } } }
     ]);
     const totalRevenue = revenueData.length > 0 ? revenueData[0].total : 0;
@@ -36,7 +35,7 @@ const getAnalytics = async (req, res) => {
       { 
         $match: { 
           createdAt: { $gte: thirtyDaysAgo },
-          status: { $ne: 'Cancelled' }
+          status: 'Delivered'
         } 
       },
       {
@@ -64,7 +63,7 @@ const getAnalytics = async (req, res) => {
 
     // 3. Top Selling Products
     const topProductsData = await Order.aggregate([
-      { $match: { status: { $ne: 'Cancelled' } } },
+      { $match: { status: 'Delivered' } },
       { $unwind: "$orderItems" },
       {
         $group: {
@@ -79,7 +78,7 @@ const getAnalytics = async (req, res) => {
     // 4. User Demographics (New vs Returning)
     // Definition: Returning = users with more than 1 order
     const userStats = await Order.aggregate([
-        { $match: { status: { $ne: 'Cancelled' }, user: { $exists: true } } },
+        { $match: { status: 'Delivered', user: { $exists: true } } },
         { $group: { _id: "$user", count: { $sum: 1 } } }
     ]);
 

@@ -1,4 +1,5 @@
 const Order = require('../models/Order');
+const adminCache = require('../utils/adminCache');
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -132,6 +133,7 @@ const updateOrderStatus = async (req, res) => {
         order.deliveredAt = Date.now();
       }
       const updatedOrder = await order.save();
+      adminCache.del('admin_dashboard_stats');
       res.json(updatedOrder);
     } else {
       res.status(404).json({ message: 'Order not found' });
@@ -154,6 +156,7 @@ const updateOrderToDelivered = async (req, res) => {
       order.status = 'Delivered';
 
       const updatedOrder = await order.save();
+      adminCache.del('admin_dashboard_stats');
       res.json(updatedOrder);
     } else {
       res.status(404).json({ message: 'Order not found' });
