@@ -168,11 +168,11 @@ const Cart = () => {
              <div className="lg:sticky lg:top-32 space-y-8">
                 {/* Promo Code Box */}
                 <div className="p-5 lg:p-8 bg-dark rounded-[2rem] text-white shadow-2xl shadow-dark/20 relative overflow-hidden group">
-                   <Sparkles className="absolute top-0 right-0 w-32 h-32 text-white/5 -translate-y-8 translate-x-8 group-hover:scale-110 transition-transform duration-1000" />
-                   <h3 className="text-xs font-black uppercase tracking-[0.3em] mb-6 inline-flex items-center">
+                   <Sparkles className="absolute top-0 right-0 w-32 h-32 text-white/5 -translate-y-8 translate-x-8 group-hover:scale-110 transition-transform duration-1000 pointer-events-none" />
+                   <h3 className="text-xs font-black uppercase tracking-[0.3em] mb-6 inline-flex items-center relative z-10">
                      <Tag size={14} className="mr-2" /> Apply Coupon
                    </h3>
-                   <div className="flex gap-3">
+                   <div className="flex gap-3 relative z-10">
                       <input 
                         type="text" 
                         placeholder="e.g. SUMMER20" 
