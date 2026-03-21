@@ -4,7 +4,7 @@ import { Instagram, Twitter, Facebook, Youtube, Mail, MapPin, Phone, ShieldCheck
 
 const Footer = () => {
   return (
-    <footer className="bg-[#eaeaec] text-dark pt-6 lg:pt-10 pb-6 border-t border-border">
+    <footer className="bg-[#eaeaec] text-dark pt-6 lg:pt-10 pb-20 md:pb-6 border-t border-border">
       <div className="container mx-auto px-4 lg:px-10">
         
         {/* Features / Benefits */}

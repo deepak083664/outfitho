@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingBag, Search, Menu, X, Heart, Settings } from 'lucide-react';
+import { ShoppingBag, Menu, X, Heart } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
+import BottomNav from './BottomNav';
 
 const Navbar = () => {
   const { wishlistItems } = useWishlist();
   const { cartCount } = useCart();
-  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -25,14 +25,6 @@ const Navbar = () => {
       return () => clearTimeout(timer);
     }
   };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -157,6 +149,7 @@ const Navbar = () => {
                   <Link 
                     key={link.name} 
                     to={link.path} 
+                    onClick={toggleMobileMenu}
                     className={`block text-lg font-black uppercase tracking-tight ${link.primary ? 'text-primary' : 'text-dark'}`}
                   >
                     {link.name}
@@ -168,7 +161,7 @@ const Navbar = () => {
                 {[
                   { icon: Heart, label: 'My Wishlist', path: '/wishlist' },
                 ].map((item) => (
-                  <Link key={item.label} to={item.path} className="flex items-center space-x-4 text-secondary hover:text-dark transition-colors">
+                  <Link key={item.label} to={item.path} onClick={toggleMobileMenu} className="flex items-center space-x-4 text-secondary hover:text-dark transition-colors">
                      <div className="w-10 h-10 bg-surface rounded-full flex items-center justify-center"><item.icon size={18} /></div>
                      <span className="text-sm font-bold uppercase tracking-widest">{item.label}</span>
                   </Link>
@@ -177,6 +170,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+      <BottomNav toggleMobileMenu={toggleMobileMenu} />
     </>
   );
 };
