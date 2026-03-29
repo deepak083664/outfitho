@@ -17,10 +17,7 @@ const allowedOrigins = process.env.FRONTEND_URL
   : ['*'];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    // Dynamically allow any origin to avoid blocked requests on Render
-    callback(null, true);
-  },
+  origin: true,
   credentials: true
 }));
 app.use(compression());
