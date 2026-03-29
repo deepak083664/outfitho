@@ -12,13 +12,32 @@ const app = express();
 
 // 1. Basic Middlewares
 app.use(express.json()); 
-const allowedOrigins = process.env.FRONTEND_URL 
-  ? process.env.FRONTEND_URL.split(',') 
-  : ['*'];
+// Define explicit allowed origins
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://www.outfitho.com',
+  'https://outfitho.com',
+  'https://outfitho-server.vercel.app'
+];
 
+// Production-ready CORS configuration
 app.use(cors({
-  origin: true,
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Ensure no trailing slash issues in origin matching
+    const cleanOrigin = origin.endsWith('/') ? origin.slice(0, -1) : origin;
+    
+    if (allowedOrigins.includes(cleanOrigin)) {
+      callback(null, true);
+    } else {
+      console.error(`Blocked by CORS: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200 // For legacy browser support
 }));
 app.use(compression());
 
