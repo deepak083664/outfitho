@@ -1,17 +1,8 @@
 import axios from 'axios';
 
-const getBaseUrl = () => {
-  const envUrl = import.meta.env.VITE_API_URL;
-  if (envUrl) {
-    // Remove trailing slash if present, then append /api if not already there
-    const cleanUrl = envUrl.replace(/\/$/, '');
-    return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
-  }
-  return 'https://outfitho-eu5n.onrender.com/api';
-};
-
+// Strictly use Vite environment variable, exactly as configured
 const api = axios.create({
-  baseURL: getBaseUrl(),
+  baseURL: `${import.meta.env.VITE_API_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
