@@ -86,7 +86,7 @@ const Footer = () => {
                     <Instagram size={20} />
                   </a>
                   <a href="#" className="p-3 bg-white rounded-lg shadow-sm hover:bg-primary hover:text-white transition-all duration-300">
-                    <Twitter size={20} />
+                    <Youtube size={20} />
                   </a>
                   <a href="#" className="p-3 bg-white rounded-lg shadow-sm hover:bg-primary hover:text-white transition-all duration-300">
                     <Facebook size={20} />
