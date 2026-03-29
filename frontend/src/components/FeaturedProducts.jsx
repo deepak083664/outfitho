@@ -13,6 +13,7 @@ const FeaturedProducts = () => {
         setLoading(true);
         // Request 20 products from backend
         const { data } = await api.get('/products?pageSize=20');
+        console.log('Featured Products API Response:', data);
         setProducts(data.products || []);
       } catch (error) {
         console.error('Error fetching featured products:', error);

@@ -7,7 +7,7 @@ const getBaseUrl = () => {
     const cleanUrl = envUrl.replace(/\/$/, '');
     return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
   }
-  return 'https://outfitho.onrender.com/api';
+  return 'https://outfitho-eu5n.onrender.com/api';
 };
 
 const api = axios.create({

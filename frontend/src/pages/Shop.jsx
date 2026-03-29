@@ -26,6 +26,8 @@ const Shop = () => {
       
       const { data } = await api.get(url);
       
+      console.log('Shop API Response:', data);
+      
       // The API now returns { products, page, pages, total }
       setProducts(data.products || []);
       setPages(data.pages || 1);
