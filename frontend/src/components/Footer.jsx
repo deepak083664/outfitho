@@ -85,7 +85,7 @@ const Footer = () => {
                   <a href="https://www.instagram.com/_outfitho_?igsh=MW55NWlzNTQwajBtYQ==" target="_blank" rel="noopener noreferrer" className="p-3 bg-white rounded-lg shadow-sm hover:bg-primary hover:text-white transition-all duration-300">
                     <Instagram size={20} />
                   </a>
-                  <a href="#" className="p-3 bg-white rounded-lg shadow-sm hover:bg-primary hover:text-white transition-all duration-300">
+                  <a href="https://youtube.com/@outfitho?si=5g2n-v8QopDfUjaL" target="_blank" rel="noopener noreferrer" className="p-3 bg-white rounded-lg shadow-sm hover:bg-primary hover:text-white transition-all duration-300">
                     <Youtube size={20} />
                   </a>
                   <a href="https://www.facebook.com/share/1AqwxbqUEL/" target="_blank" rel="noopener noreferrer" className="p-3 bg-white rounded-lg shadow-sm hover:bg-primary hover:text-white transition-all duration-300">
