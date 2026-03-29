@@ -1,9 +1,16 @@
-require('dotenv').config();
+// Load environment variables only if not in production
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
+
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
 const connectDB = require('./config/db');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+
+// Set NODE_ENV explicitly to production if not provided by Render
+const NODE_ENV = process.env.NODE_ENV || 'production';
 
 // Connect to MongoDB
 connectDB();
@@ -11,8 +18,9 @@ connectDB();
 const app = express();
 
 // 1. Basic Middlewares
-app.use(express.json()); 
-// Define explicit allowed origins
+app.use(express.json());
+
+// 2. CORS Configuration (MUST be before routes)
 const allowedOrigins = [
   'http://localhost:5173',
   'https://www.outfitho.com',
@@ -20,10 +28,8 @@ const allowedOrigins = [
   'https://outfitho-server.vercel.app'
 ];
 
-// Production-ready CORS configuration
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
     // Ensure no trailing slash issues in origin matching
@@ -37,11 +43,14 @@ app.use(cors({
     }
   },
   credentials: true,
-  optionsSuccessStatus: 200 // For legacy browser support
+  optionsSuccessStatus: 200, // Handle preflight OPTIONS requests perfectly
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 app.use(compression());
 
-// Routes
+// 3. Routes
 app.use('/api/users', require('./routes/authRoutes'));
 app.use('/api/products', require('./routes/productRoutes'));
 app.use('/api/orders', require('./routes/orderRoutes'));
@@ -55,12 +64,13 @@ app.get('/', (req, res) => {
   res.send('API is running securely...');
 });
 
-// 2. Error Handling Middleware
+// 4. Error Handling Middleware
 app.use(notFound);
 app.use(errorHandler);
 
+// 5. Server Port
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  console.log(`Server running in ${NODE_ENV} mode on port ${PORT}`);
 });
