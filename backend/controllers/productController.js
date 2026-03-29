@@ -34,10 +34,20 @@ const productCache = new NodeCache({ stdTTL: 60 }); // Cache for 60 seconds
 // @access  Public
 const getProducts = async (req, res) => {
   try {
-    const category = req.query.category;
-    const keyword = req.query.keyword;
-    const page = Number(req.query.pageNumber) || 1;
-    const pageSize = Number(req.query.pageSize) || 12;
+    // Sanitize query params to avoid MongoDB injection crashes
+    const category = typeof req.query.category === 'string' ? req.query.category : undefined;
+    const keyword = typeof req.query.keyword === 'string' ? req.query.keyword : undefined;
+    
+    // Explicit pagination logic
+    let page = parseInt(req.query.pageNumber, 10);
+    if (isNaN(page) || page < 1) {
+      page = 1; // Default page = 1 if not provided or invalid
+    }
+    
+    let pageSize = parseInt(req.query.pageSize, 10);
+    if (isNaN(pageSize) || pageSize < 1) {
+      pageSize = 12; // Default pageSize
+    }
     
     // Create cache key based on query params
     const cacheKey = `products_${category || 'all'}_${keyword || 'none'}_${page}_${pageSize}`;
@@ -69,7 +79,8 @@ const getProducts = async (req, res) => {
     productCache.set(cacheKey, response);
     res.json(response);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('API Error in getProducts:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
