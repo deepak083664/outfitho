@@ -82,13 +82,13 @@ const Footer = () => {
              <div className="w-full lg:max-w-xs">
                 <h3 className="text-xs font-black uppercase tracking-widest mb-4">Follow Us</h3>
                 <div className="flex space-x-6 mb-6">
-                  <a href="#" className="p-3 bg-white rounded-lg shadow-sm hover:bg-primary hover:text-white transition-all duration-300">
+                  <a href="https://www.instagram.com/_outfitho_?igsh=MW55NWlzNTQwajBtYQ==" target="_blank" rel="noopener noreferrer" className="p-3 bg-white rounded-lg shadow-sm hover:bg-primary hover:text-white transition-all duration-300">
                     <Instagram size={20} />
                   </a>
                   <a href="#" className="p-3 bg-white rounded-lg shadow-sm hover:bg-primary hover:text-white transition-all duration-300">
                     <Youtube size={20} />
                   </a>
-                  <a href="#" className="p-3 bg-white rounded-lg shadow-sm hover:bg-primary hover:text-white transition-all duration-300">
+                  <a href="https://www.facebook.com/share/1AqwxbqUEL/" target="_blank" rel="noopener noreferrer" className="p-3 bg-white rounded-lg shadow-sm hover:bg-primary hover:text-white transition-all duration-300">
                     <Facebook size={20} />
                   </a>
                 </div>
