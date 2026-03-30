@@ -25,7 +25,8 @@ const allowedOrigins = [
   'http://localhost:5173',
   'https://www.outfitho.com',
   'https://outfitho.com',
-  'https://outfitho-server.vercel.app'
+  'https://outfitho-server.vercel.app',
+  'https://outfitho.vercel.app'
 ];
 
 app.use(cors({
