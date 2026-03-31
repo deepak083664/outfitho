@@ -48,6 +48,10 @@ const Checkout = () => {
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     if (step === 1) {
+      if (contactNo.length !== 10) {
+        toast.error('Please enter a valid 10-digit contact number');
+        return;
+      }
       setStep(2);
       return;
     }
@@ -235,10 +239,13 @@ const Checkout = () => {
                              <input 
                                 type="tel" 
                                 required 
+                                maxLength={10}
+                                minLength={10}
+                                pattern="[0-9]{10}"
                                 value={contactNo}
-                                onChange={(e) => setContactNo(e.target.value)}
+                                onChange={(e) => setContactNo(e.target.value.replace(/\D/g, ''))}
                                 className="w-full bg-surface/40 border-2 border-transparent focus:border-dark focus:bg-white px-5 py-3.5 rounded-xl outline-none transition-all text-xs font-bold" 
-                                placeholder="+91 0000 000 000" 
+                                placeholder="10-digit number" 
                               />
                           </div>
                           <div className="md:col-span-2 space-y-2">
@@ -277,8 +284,7 @@ const Checkout = () => {
                        </div>
 
                        <button 
-                        type="button" 
-                        onClick={() => setStep(2)}
+                        type="submit" 
                         className="w-full lg:w-max px-12 btn-primary !rounded-xl !py-4 flex items-center justify-center space-x-3 shadow-xl active:scale-95 transition-all group"
                        >
                           <span className="font-black tracking-[0.2em] text-[10px]">CONTINUE TO PAYMENT</span>
